@@ -7,7 +7,6 @@ export default function Page() {
     <LatarKarnival className="daftar">
       <div className="daftar-isi">
         <TajukKarnival />
-        <p className="daftar-spm">Daftar Kehadiran</p>
         <DaftarForm />
       </div>
     </LatarKarnival>

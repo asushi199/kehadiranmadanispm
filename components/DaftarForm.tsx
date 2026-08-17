@@ -128,6 +128,7 @@ export function DaftarForm() {
 
   return (
     <form className="gerai-kad" onSubmit={hantar}>
+      <p className="daftar-spm">Daftar Kehadiran</p>
       <label className="medan-label" htmlFor="nama">
         Nama
       </label>

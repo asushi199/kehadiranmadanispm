@@ -11,8 +11,10 @@ export const metadata: Metadata = {
 export default function AdminPage() {
   return (
     <LatarKarnival className="daftar">
-      <TajukKarnival padat />
-      <AdminPanel />
+      <div className="daftar-isi daftar-isi-lebar">
+        <TajukKarnival padat />
+        <AdminPanel />
+      </div>
     </LatarKarnival>
   );
 }
