@@ -123,27 +123,29 @@ body {
   right: 0.55rem;
 }
 
-.latar-kpm {
+.kepala-kpm {
   display: block;
   height: clamp(6.2rem, 14vh, 10.5rem);
   width: auto;
   max-width: min(34rem, calc(100% - 6.2rem));
-  margin: 0.15rem auto 0.4rem;
+  margin: 0 auto 0.2rem;
   object-fit: contain;
-  position: relative;
-  z-index: 2;
 }
 
-.daftar .latar-kpm {
+.daftar .kepala-kpm {
   height: clamp(5.8rem, 18vw, 9.2rem);
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.25rem;
 }
 
-.papan-page .latar-kpm {
-  flex: 0 0 auto;
-  height: clamp(7.2rem, 18vh, 12rem);
-  max-width: min(38rem, calc(100% - 5.8rem));
-  margin: 0.1rem auto 0.2rem;
+.papan .kepala-kpm {
+  height: clamp(7.2rem, 16vh, 11.5rem);
+  max-width: min(36rem, calc(100% - 7.5rem));
+  margin-bottom: 0.15rem;
+}
+
+.kepala-tajuk.padat .kepala-kpm {
+  height: clamp(4.2rem, 10vw, 6.2rem);
+  margin-bottom: 0.2rem;
 }
 
 .kepala-tajuk {
@@ -432,18 +434,25 @@ body {
 }
 
 .papan-kepala {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
+  width: 100%;
+  gap: 0;
 }
 
 .papan-util {
+  position: absolute;
+  top: 0.15rem;
+  left: 0;
+  right: 0;
   display: flex;
-  width: 100%;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 2.4rem 0.35rem;
+  align-items: flex-start;
+  padding: 0 0.2rem;
+  pointer-events: none;
+  z-index: 3;
 }
 
 .live-badge {

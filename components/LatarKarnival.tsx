@@ -68,13 +68,6 @@ export function LatarKarnival({
       <div className="latar-bingkai">
         <AtomIkon />
         <BukuIkon />
-        <img
-          className="latar-kpm"
-          src="/logo-kpm.png"
-          alt="Kementerian Pendidikan"
-          width={1024}
-          height={575}
-        />
         {children}
       </div>
     </div>
