@@ -33,9 +33,8 @@ const ikon: Record<Kategori, ReactNode> = {
   ),
   guru: (
     <svg viewBox="0 0 32 32" className="kategori-ikon" aria-hidden="true">
-      <rect x="5" y="7" width="22" height="15" rx="1.5" fill="currentColor" />
-      <rect x="7" y="9" width="18" height="11" fill="#061433" />
-      <path d="M12 26h8M16 22v4" stroke="currentColor" strokeWidth="2" />
+      <circle cx="16" cy="10" r="3.4" fill="currentColor" />
+      <path d="M7 25c.6-5.2 4-8 9-8s8.4 2.8 9 8" fill="currentColor" />
     </svg>
   ),
   ibu_bapa: (
