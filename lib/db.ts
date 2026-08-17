@@ -163,3 +163,16 @@ export async function senaraiKehadiran(): Promise<RekodKehadiran[]> {
   const rows = await readJson();
   return [...rows].sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
+
+export async function padamSemuaKehadiran() {
+  pastikanStor();
+  if (adaTurso()) {
+    const client = await ensureTurso();
+    await client.execute("DELETE FROM kehadiran");
+    return;
+  }
+
+  await enqueueJson(async () => {
+    await writeJson([]);
+  });
+}

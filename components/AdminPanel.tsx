@@ -23,6 +23,8 @@ export function AdminPanel() {
   const [rows, setRows] = useState<RekodKehadiran[] | null>(null);
   const [memuat, setMemuat] = useState(false);
 
+  const [memadam, setMemadam] = useState(false);
+
   async function buka(event: FormEvent) {
     event.preventDefault();
     setMemuat(true);
@@ -43,6 +45,31 @@ export function AdminPanel() {
       setRalat("Tidak dapat memuatkan rekod.");
     } finally {
       setMemuat(false);
+    }
+  }
+
+  async function padamSemua() {
+    const sah = window.confirm(
+      "Padam semua rekod ujian? Tindakan ini tidak boleh dibatalkan.",
+    );
+    if (!sah) return;
+
+    setMemadam(true);
+    setRalat("");
+    try {
+      const res = await fetch(`/api/rekod?pin=${encodeURIComponent(pin)}`, {
+        method: "DELETE",
+      });
+      const data = (await res.json()) as { ralat?: string };
+      if (!res.ok) {
+        setRalat(data.ralat || "Tidak dapat memadam rekod.");
+        return;
+      }
+      setRows([]);
+    } catch {
+      setRalat("Tidak dapat memadam rekod.");
+    } finally {
+      setMemadam(false);
     }
   }
 
@@ -76,10 +103,21 @@ export function AdminPanel() {
         <>
           <div className="admin-bar">
             <p>{ringkasan}</p>
-            <a href={`/api/export?pin=${encodeURIComponent(pin)}`}>
-              Muat turun CSV
-            </a>
+            <div className="admin-tindakan">
+              <a href={`/api/export?pin=${encodeURIComponent(pin)}`}>
+                Muat turun CSV
+              </a>
+              <button
+                type="button"
+                className="btn-padam"
+                onClick={() => void padamSemua()}
+                disabled={memadam || rows.length === 0}
+              >
+                {memadam ? "Memadam…" : "Padam semua rekod"}
+              </button>
+            </div>
           </div>
+          {ralat ? <p className="ralat">{ralat}</p> : null}
           <div className="admin-jadual-bungkus">
             <table className="admin-jadual">
               <thead>

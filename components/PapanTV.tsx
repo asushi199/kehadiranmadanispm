@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { TajukKarnival } from "@/components/TajukKarnival";
 import {
@@ -9,6 +9,7 @@ import {
   KATEGORI_WARNA,
   emptyKategoriCount,
 } from "@/lib/kategori";
+import { KategoriIkon } from "@/components/KategoriIkon";
 import type { Statistik } from "@/lib/types";
 
 function padDigits(n: number) {
@@ -149,32 +150,35 @@ export function PapanTV({ daftarUrl }: { daftarUrl: string }) {
         </section>
       </div>
 
-      <ul className="lorong">
+      <ul className="kad-kategori-grid">
         {KATEGORI.map((item) => {
           const n = statistik.kategori[item];
-          const peratus = Math.round((n / maksimum) * 100);
+          const bahagian =
+            statistik.jumlah === 0 ? 0 : Math.round((n / statistik.jumlah) * 100);
+          const bar = Math.round((n / maksimum) * 100);
           return (
-            <li key={item} className="lorong-item">
-              <div className="lorong-meta">
-                <span className="lorong-nama">{KATEGORI_LABEL[item]}</span>
-                <span className="lorong-nombor">
-                  {n}
-                  <small>
-                    {statistik.jumlah === 0
-                      ? "0%"
-                      : `${Math.round((n / statistik.jumlah) * 100)}%`}
-                  </small>
-                </span>
+            <li
+              key={item}
+              className="kad-kategori"
+              style={{ "--aksen": KATEGORI_WARNA[item] } as CSSProperties}
+            >
+              <div className="kad-kategori-kepala">
+                <KategoriIkon jenis={item} className="kategori-ikon kad-ikon" />
+                <span>{KATEGORI_LABEL[item]}</span>
               </div>
-              <div className="lorong-trek">
-                <span
-                  className="lorong-isi"
-                  style={{
-                    width: `${peratus}%`,
-                    background: KATEGORI_WARNA[item],
-                    boxShadow: `0 0 16px ${KATEGORI_WARNA[item]}`,
-                  }}
-                />
+              <p className="kad-kategori-nombor">{n}</p>
+              <div className="kad-kategori-bawah">
+                <div className="lorong-trek">
+                  <span
+                    className="lorong-isi"
+                    style={{
+                      width: `${bar}%`,
+                      background: KATEGORI_WARNA[item],
+                      boxShadow: `0 0 16px ${KATEGORI_WARNA[item]}`,
+                    }}
+                  />
+                </div>
+                <span className="kad-kategori-peratus">{bahagian}%</span>
               </div>
             </li>
           );
