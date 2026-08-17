@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { KATEGORI_LABEL } from "@/lib/kategori";
-import type { RekodKehadiran } from "@/lib/types";
+import type { RekodKehadiran, Statistik } from "@/lib/types";
+
+const PIN_KEY = "spm-admin-pin";
 
 function formatMasa(iso: string) {
   const date = new Date(iso);
@@ -17,30 +19,96 @@ function formatMasa(iso: string) {
   }).format(date);
 }
 
+async function muatRekod(kunci: string) {
+  const res = await fetch(`/api/rekod?pin=${encodeURIComponent(kunci)}`, {
+    cache: "no-store",
+  });
+  const data = (await res.json()) as {
+    rows?: RekodKehadiran[];
+    ralat?: string;
+  };
+  return { res, data };
+}
+
 export function AdminPanel() {
   const [pin, setPin] = useState("");
+  const [dibuka, setDibuka] = useState(false);
   const [ralat, setRalat] = useState("");
   const [rows, setRows] = useState<RekodKehadiran[] | null>(null);
   const [memuat, setMemuat] = useState(false);
-
   const [memadam, setMemadam] = useState(false);
+  const jumlahTerakhir = useRef<number | null>(null);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem(PIN_KEY);
+    if (!saved) return;
+    setPin(saved);
+    setDibuka(true);
+  }, []);
+
+  useEffect(() => {
+    if (!dibuka || !pin) return;
+    let aktif = true;
+
+    async function muatPenuh() {
+      const { res, data } = await muatRekod(pin);
+      if (!aktif) return;
+      if (!res.ok) {
+        if (res.status === 401) {
+          sessionStorage.removeItem(PIN_KEY);
+          setDibuka(false);
+          setRows(null);
+          jumlahTerakhir.current = null;
+          setRalat(data.ralat || "PIN tidak sah.");
+        }
+        return;
+      }
+      sessionStorage.setItem(PIN_KEY, pin);
+      const list = data.rows || [];
+      setRows(list);
+      jumlahTerakhir.current = list.length;
+    }
+
+    async function semak() {
+      try {
+        if (jumlahTerakhir.current === null) {
+          await muatPenuh();
+          return;
+        }
+        const res = await fetch("/api/statistik", { cache: "no-store" });
+        if (!res.ok || !aktif) return;
+        const data = (await res.json()) as Statistik;
+        if (data.jumlah === jumlahTerakhir.current) return;
+        await muatPenuh();
+      } catch {
+        /* keep the last list if the network blips */
+      }
+    }
+
+    void semak();
+    const id = window.setInterval(semak, 2000);
+    return () => {
+      aktif = false;
+      window.clearInterval(id);
+    };
+  }, [dibuka, pin]);
 
   async function buka(event: FormEvent) {
     event.preventDefault();
     setMemuat(true);
     setRalat("");
     try {
-      const res = await fetch(`/api/rekod?pin=${encodeURIComponent(pin)}`);
-      const data = (await res.json()) as {
-        rows?: RekodKehadiran[];
-        ralat?: string;
-      };
+      const { res, data } = await muatRekod(pin);
       if (!res.ok) {
         setRalat(data.ralat || "PIN tidak sah.");
         setRows(null);
+        setDibuka(false);
         return;
       }
+      sessionStorage.setItem(PIN_KEY, pin);
       setRows(data.rows || []);
+      jumlahTerakhir.current = (data.rows || []).length;
+      setDibuka(true);
     } catch {
       setRalat("Tidak dapat memuatkan rekod.");
     } finally {
@@ -66,6 +134,7 @@ export function AdminPanel() {
         return;
       }
       setRows([]);
+      jumlahTerakhir.current = 0;
     } catch {
       setRalat("Tidak dapat memadam rekod.");
     } finally {
@@ -74,16 +143,16 @@ export function AdminPanel() {
   }
 
   const ringkasan = useMemo(() => {
-    if (!rows) return "";
+    if (!rows) return "Memuatkan…";
     return `${rows.length} rekod`;
   }, [rows]);
 
   return (
-    <div className="admin">
+    <div className={`admin${dibuka ? "" : " admin-masuk"}`}>
       <h1>Rekod kehadiran</h1>
       <p className="admin-sub">SPM · Sektor Pembangunan Murid · staf gerai sahaja</p>
 
-      {!rows ? (
+      {!dibuka ? (
         <form className="admin-pin" onSubmit={buka}>
           <label htmlFor="pin">PIN staf</label>
           <input
@@ -102,6 +171,10 @@ export function AdminPanel() {
       ) : (
         <>
           <div className="admin-bar">
+            <p className="live-badge">
+              <span className="live-dot" />
+              Langsung
+            </p>
             <p>{ringkasan}</p>
             <div className="admin-tindakan">
               <a href={`/api/export?pin=${encodeURIComponent(pin)}`}>
@@ -111,7 +184,7 @@ export function AdminPanel() {
                 type="button"
                 className="btn-padam"
                 onClick={() => void padamSemua()}
-                disabled={memadam || rows.length === 0}
+                disabled={memadam || !rows || rows.length === 0}
               >
                 {memadam ? "Memadam…" : "Padam semua rekod"}
               </button>
@@ -128,7 +201,11 @@ export function AdminPanel() {
                 </tr>
               </thead>
               <tbody>
-                {rows.length === 0 ? (
+                {rows === null ? (
+                  <tr>
+                    <td colSpan={3}>Memuatkan…</td>
+                  </tr>
+                ) : rows.length === 0 ? (
                   <tr>
                     <td colSpan={3}>Belum ada rekod.</td>
                   </tr>

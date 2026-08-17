@@ -714,6 +714,19 @@ body {
   margin: 0;
 }
 
+.admin-masuk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.admin-masuk .admin-pin {
+  width: min(20rem, 100%);
+  margin-inline: auto;
+  text-align: left;
+}
+
 .admin h1 {
   margin: 0.5rem 0 0;
   font-family: var(--font-display), sans-serif;
