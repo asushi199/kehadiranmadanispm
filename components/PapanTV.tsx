@@ -13,7 +13,7 @@ import { KategoriIkon } from "@/components/KategoriIkon";
 import type { Statistik } from "@/lib/types";
 
 function padDigits(n: number) {
-  const text = String(Math.max(0, n));
+  const text = String(Math.max(0, Math.floor(n)));
   return text.length >= 3 ? text : text.padStart(3, "0");
 }
 
@@ -21,7 +21,12 @@ function Scoreboard({ value }: { value: number }) {
   const digits = padDigits(value).split("");
 
   return (
-    <div className="scoreboard" aria-live="polite" aria-atomic="true">
+    <div
+      className="scoreboard"
+      data-digits={digits.length}
+      aria-live="polite"
+      aria-atomic="true"
+    >
       {digits.map((digit, i) => (
         <span className="digit-window" key={`${i}-${digits.length}`}>
           <span className="digit-face" key={`${digit}-${value}`}>
