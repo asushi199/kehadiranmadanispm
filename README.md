@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kehadiran SPM — Karnival Pendidikan Madani
 
-## Getting Started
+Gerai **Sektor Pembangunan Murid (SPM)** 的出席登记系统。访客填写姓名和身份；摊位电视即时显示人数和分类图。
 
-First, run the development server:
+## 三个网址
+
+| 网址 | 用途 |
+| --- | --- |
+| `/` | 登记表（印 QR 用这个） |
+| `/papan` | 电视大屏 |
+| `/admin` | 同事查看记录、下载 Excel/CSV |
+
+## 在电脑上先试
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 http://localhost:3000  
+还没接云数据库时，记录会暂存在 `data/kehadiran.json`。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+本地管理员 PIN：把 `.env.example` 复制为 `.env.local`，再改 `ADMIN_PIN`。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 部署到云端（Vercel + Turso）
 
-## Learn More
+1. 在 [Turso](https://turso.tech) 免费建一个数据库：Create database，复制 URL，再创建一个 token。
+2. 把这个项目推到 GitHub。
+3. 在 [Vercel](https://vercel.com/new) 导入该仓库。
+4. Vercel → Settings → Environment Variables 填入：
 
-To learn more about Next.js, take a look at the following resources:
+```
+TURSO_DATABASE_URL=libsql://...
+TURSO_AUTH_TOKEN=...
+ADMIN_PIN=改成同事才知道的PIN
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. 重新 Deploy。电视打开 `https://你的域名.vercel.app/papan`，按 F11 或页面上的 **Skrin penuh**。电视上的 QR 会指向登记页。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+数据表会在第一条记录写入时自动创建。
