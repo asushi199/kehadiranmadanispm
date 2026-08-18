@@ -14,13 +14,15 @@ export function TajukKarnival({ padat = false }: { padat?: boolean }) {
         <span className="kepala-emas">Madani</span>
       </p>
       <p className="kepala-daerah">Daerah Manjung</p>
-      <img
-        className="kepala-spm-logo"
-        src="/logo-spm.png"
-        alt="Sektor Pembangunan Murid, Unit Pembangunan Bakat Murid, Unit Hal Ehwal Murid"
-        width={1024}
-        height={343}
-      />
+      <div className="kepala-spm-plat">
+        <img
+          className="kepala-spm-logo"
+          src="/logo-spm.png"
+          alt="Sektor Pembangunan Murid, Unit Pembangunan Bakat Murid, Unit Hal Ehwal Murid"
+          width={765}
+          height={317}
+        />
+      </div>
       <p className="kepala-spm">
         <span className="spm-lencana">SPM</span>
         <span className="spm-nama">Sektor Pembangunan Murid</span>
